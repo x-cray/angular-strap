@@ -185,15 +185,18 @@ angular.module('mgcrea.ngStrap.typeahead', ['mgcrea.ngStrap.tooltip', 'mgcrea.ng
         scope.$watch(attr.ngModel, function(newValue, oldValue) {
           // console.warn('$watch', element.attr('ng-model'), newValue);
           scope.$modelValue = newValue; // Publish modelValue on scope for custom templates
-          parsedOptions.valuesFn(scope, controller)
-          .then(function(values) {
-            if(values.length > limit) values = values.slice(0, limit);
-            // Do not re-queue an update if a correct value has been selected
-            if(values.length === 1 && values[0].value === newValue) return;
-            typeahead.update(values);
-            // Queue a new rendering that will leverage collection loading
-            controller.$render();
-          });
+
+          if (!angular.isObject(newValue)) {
+            parsedOptions.valuesFn(scope, controller)
+            .then(function(values) {
+              if(values.length > limit) values = values.slice(0, limit);
+              // Do not re-queue an update if a correct value has been selected
+              if(values.length === 1 && values[0].value === newValue) return;
+              typeahead.update(values);
+              // Queue a new rendering that will leverage collection loading
+              controller.$render();
+            });
+          }
         });
 
         // Model rendering in view
